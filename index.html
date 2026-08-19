@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VERY RAY Market - ตลาดซื้อขายสิ่งมีชีวิตออนไลน์พรีเมียม</title>
+    <title>VERY RAY Market - ตลาดของแต่งตู้ปลาและสิ่งมีชีวิต</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -17,7 +17,6 @@
                     },
                     boxShadow: {
                         'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
-                        'glow': '0 4px 20px -5px rgba(37, 99, 235, 0.4)'
                     }
                 }
             }
@@ -49,7 +48,7 @@
                         
                         <template x-if="userRole === 'vendor' && vendorStatus === 'approved'">
                             <button @click="currentTab = 'post-product'" class="bg-gradient-to-r from-accent to-red-500 hover:from-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md transition">
-                                ➕ ลงขายสินค้า
+                                ➕ ลงขายของแต่งตู้ปลา
                             </button>
                         </template>
 
@@ -74,10 +73,10 @@
     <!-- 📦 Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8">
 
-        <!-- 1. หน้าแรก (Home) -->
+        <!-- 1. หน้าแรก (Home - โชว์ของแต่งตู้ปลา) -->
         <div x-show="currentTab === 'home'" x-transition>
             <div class="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-3 sm:space-y-0">
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800">ตลาดสิ่งมีชีวิต <span class="text-secondary">ยอดนิยม</span></h1>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800">🐠 ตลาดของแต่งตู้ปลา <span class="text-secondary">และอุปกรณ์</span></h1>
                 <div class="text-sm font-bold text-secondary bg-blue-100 px-4 py-1.5 rounded-full shadow-sm" x-text="'ทั้งหมด ' + products.length + ' รายการ'"></div>
             </div>
 
@@ -85,12 +84,11 @@
                 <template x-for="item in products" :key="item.id">
                     <div class="group bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-2xl border border-slate-100 transition-all duration-300 transform hover:-translate-y-2 flex flex-col justify-between">
                         <div>
-                            <div class="relative overflow-hidden aspect-[4/3]">
-                                <img :src="item.images[0]" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="รูปสินค้า" onerror="this.src='https://placehold.co/600x400?text=No+Image'">
+                            <div class="relative overflow-hidden aspect-[4/3] bg-slate-100">
+                                <img :src="item.images[0]" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="รูปสินค้า" onerror="this.src='https://placehold.co/600x400?text=Aquarium+Decor'">
                                 <div class="absolute top-3 right-2 bg-white/95 backdrop-blur text-xs font-black px-3 py-1 rounded-full text-primary shadow" x-text="item.storeName"></div>
                             </div>
                             <div class="p-5">
-                                <!-- แสดงดาวรีวิวและปุ่มติดตาม -->
                                 <div class="flex justify-between items-center mb-2">
                                     <div class="text-xs font-bold text-amber-500 flex items-center space-x-1">
                                         <span>★</span>
@@ -99,7 +97,7 @@
                                     </div>
                                     <button @click="toggleFollow(item.storeName)" class="text-xs px-2.5 py-1 rounded-full font-bold transition"
                                             :class="isFollowing(item.storeName) ? 'bg-red-100 text-accent' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
-                                        <span x-text="isFollowing(item.storeName) ? '❤️ กำลังติดตาม' : '🤍 ติดตามร้าน'"></span>
+                                        <span x-text="isFollowing(item.storeName) ? '❤️ ติดตามแล้ว' : '🤍 ติดตามร้าน'"></span>
                                     </button>
                                 </div>
                                 <h3 class="font-extrabold text-slate-800 truncate text-lg group-hover:text-secondary transition" x-text="item.title"></h3>
@@ -126,7 +124,7 @@
             
             <form @submit.prevent="submitVendorRegistration()" class="space-y-5">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">ชื่อร้านค้า (Store Name)</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">ชื่อร้านค้า</label>
                     <input type="text" x-model="vendorForm.storeName" required class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-secondary outline-none transition">
                 </div>
                 <div>
@@ -145,17 +143,17 @@
             </form>
         </div>
 
-        <!-- 3. หน้าลงขายสินค้า (Post Product) -->
+        <!-- 3. หน้าลงขายสินค้า (Post Product - อัปโหลดรูปจากแกลเลอลี่จริง) -->
         <div x-show="currentTab === 'post-product'" class="max-w-xl mx-auto bg-white p-8 sm:p-10 rounded-3xl shadow-soft border border-slate-100" x-transition>
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-extrabold text-accent mb-2">ลงขายสิ่งมีชีวิต</h2>
-                <p class="text-sm text-slate-500">ใส่รูปได้ 1-5 รูป คั่นด้วยเครื่องหมายจุลภาค (,)</p>
+                <h2 class="text-3xl font-extrabold text-accent mb-2">ลงขายของแต่งตู้ปลา</h2>
+                <p class="text-sm text-slate-500">เลือกรูปภาพจากแกลเลอลี่หรือถ่ายรูป (สูงสุด 5 รูป)</p>
             </div>
             
             <form @submit.prevent="submitProduct()" class="space-y-5">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">ชื่อสิ่งมีชีวิต</label>
-                    <input type="text" x-model="productForm.title" required class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-accent outline-none transition">
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">ชื่อสินค้า</label>
+                    <input type="text" x-model="productForm.title" required class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-accent outline-none transition" placeholder="เช่น ขอนไม้เรดบิว/หินมังกรจัดตู้ปลา">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">ราคา (บาท)</label>
@@ -166,16 +164,16 @@
                     <textarea x-model="productForm.desc" rows="4" required class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-accent outline-none transition"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">ลิงก์รูปภาพ (สูงสุด 5 รูป)</label>
-                    <input type="text" x-model="productForm.imagesInput" required placeholder="https://img1.jpg, https://img2.jpg" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-sm focus:border-accent outline-none transition">
+                    <label class="block text-sm font-bold text-slate-700 mb-1.5">อัปโหลดรูปภาพสินค้า (1 - 5 รูป)</label>
+                    <input type="file" @change="handleImageUpload" accept="image/*" multiple class="w-full border-2 border-dashed border-slate-300 rounded-xl p-4 text-sm bg-slate-50 cursor-pointer focus:outline-none">
+                    <p class="text-xs text-slate-400 mt-1" x-text="'เลือกแล้ว ' + productForm.images.length + ' รูป'"></p>
                 </div>
                 <button type="submit" class="w-full bg-gradient-to-r from-accent to-red-500 text-white py-3.5 mt-4 rounded-xl font-bold shadow-lg transition">โพสต์ขายทันที</button>
             </form>
         </div>
 
-        <!-- 4. ห้องแชท + ระบบรีวิวร้านค้า (Chat & Review Room) -->
+        <!-- 4. ห้องแชท + รีวิวร้านค้า -->
         <div x-show="currentTab === 'chat'" class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6" x-transition>
-            <!-- ฝั่งแชท (2 คอลัมน์) -->
             <div class="lg:col-span-2 bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden flex flex-col h-[650px]">
                 <div class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-4 flex justify-between items-center shadow-md">
                     <div>
@@ -203,7 +201,7 @@
                 </div>
             </div>
 
-            <!-- ฝั่งดูรีวิวและเขียนรีวิวร้าน (1 คอลัมน์) -->
+            <!-- ฝั่งรีวิว -->
             <div class="bg-white rounded-3xl shadow-soft border border-slate-100 p-6 flex flex-col justify-between h-[650px] overflow-hidden">
                 <div>
                     <div class="flex justify-between items-center mb-4 border-b pb-3">
@@ -214,7 +212,6 @@
                         </button>
                     </div>
 
-                    <!-- รายการรีวิวที่มีอยู่ -->
                     <div class="space-y-3 overflow-y-auto max-h-[260px] pr-1">
                         <template x-for="rev in getStoreReviews(activeChatStore)">
                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-xs">
@@ -226,12 +223,11 @@
                             </div>
                         </template>
                         <template x-if="getStoreReviews(activeChatStore).length === 0">
-                            <p class="text-xs text-slate-400 text-center py-6">ยังไม่มีรีวิวสำหรับร้านนี้ เป็นคนแรกที่รีวิวเลย!</p>
+                            <p class="text-xs text-slate-400 text-center py-6">ยังไม่มีรีวิวสำหรับร้านนี้</p>
                         </template>
                     </div>
                 </div>
 
-                <!-- ฟอร์มเขียนรีวิว -->
                 <div class="border-t pt-4 mt-2">
                     <h4 class="text-xs font-bold text-slate-700 mb-2">✍️ เขียนรีวิวร้านค้านี้</h4>
                     <div class="flex items-center space-x-1 mb-2">
@@ -240,17 +236,19 @@
                             <button @click="newReview.rating = star" class="text-lg focus:outline-none" :class="newReview.rating >= star ? 'text-amber-500' : 'text-slate-300'">★</button>
                         </template>
                     </div>
-                    <textarea x-model="newReview.comment" rows="2" placeholder="พิมพ์รีวิวสินค้าหรือการบริการ..." class="w-full border rounded-xl p-2.5 text-xs focus:border-secondary outline-none mb-2"></textarea>
+                    <textarea x-model="newReview.comment" rows="2" placeholder="พิมพ์รีวิว..." class="w-full border rounded-xl p-2.5 text-xs focus:border-secondary outline-none mb-2"></textarea>
                     <button @click="submitReview()" class="w-full bg-primary text-white py-2.5 rounded-xl text-xs font-bold hover:bg-blue-800 transition">ส่งรีวิว</button>
                 </div>
             </div>
         </div>
 
-        <!-- 5. หลังบ้านแอดมิน (Admin Panel) -->
-        <div x-show="currentTab === 'admin-panel'" class="space-y-6 max-w-5xl mx-auto" x-transition>
-            <h2 class="text-3xl font-extrabold text-slate-900">⚙️ ระบบจัดการแอดมิน</h2>
+        <!-- 5. หลังบ้านแอดมิน (Admin Panel - อัปเกรดให้จัดการร้านค้าและลบสินค้าได้) -->
+        <div x-show="currentTab === 'admin-panel'" class="space-y-8 max-w-5xl mx-auto" x-transition>
+            <h2 class="text-3xl font-extrabold text-slate-900">⚙️ ระบบจัดการแอดมินสูงสุด</h2>
+            
+            <!-- ส่วนที่ 1: อนุมัติร้านค้า -->
             <div class="bg-white p-8 rounded-3xl shadow-soft border border-slate-100">
-                <h3 class="font-bold text-slate-800 mb-4">รายการขอเปิดร้านค้า (รอตรวจสอบ)</h3>
+                <h3 class="font-bold text-slate-800 mb-4 text-lg">🏪 คำขอเปิดร้านค้า (รอตรวจสอบ)</h3>
                 <div class="space-y-4">
                     <template x-for="(v, index) in pendingVendors" :key="index">
                         <div class="p-4 border-2 rounded-2xl flex justify-between items-center bg-slate-50">
@@ -266,6 +264,25 @@
                     </template>
                     <template x-if="pendingVendors.length === 0">
                         <div class="text-center py-6 text-slate-400 text-sm">ไม่มีคำขอเปิดร้านในขณะนี้</div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- ส่วนที่ 2: จัดการและลบสินค้าในระบบ -->
+            <div class="bg-white p-8 rounded-3xl shadow-soft border border-slate-100">
+                <h3 class="font-bold text-slate-800 mb-4 text-lg">🗑️ จัดการสินค้าทั้งหมดในระบบ (ลบสินค้าไม่เหมาะสม)</h3>
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                    <template x-for="(item, index) in products" :key="item.id">
+                        <div class="p-3 border rounded-2xl flex justify-between items-center bg-slate-50">
+                            <div class="flex items-center space-x-3">
+                                <img :src="item.images[0]" class="w-12 h-12 object-cover rounded-lg">
+                                <div>
+                                    <div class="font-bold text-sm text-slate-800" x-text="item.title"></div>
+                                    <div class="text-xs text-slate-500" x-text="'ร้าน: ' + item.storeName + ' | ราคา: ' + item.price + ' ฿'"></div>
+                                </div>
+                            </div>
+                            <button @click="deleteProduct(index)" class="bg-accent text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-700 shadow">ลบสินค้านี้</button>
+                        </div>
                     </template>
                 </div>
             </div>
@@ -304,99 +321,82 @@
                 loginInput: '',
                 
                 pendingVendors: [
-                    { storeName: 'OCEAN PEARL', ownerName: 'คุณธนวัฒน์', bankAcc: '098-7-65432-1', bankAccName: 'คุณธนวัฒน์' }
+                    { storeName: 'AQUA DECOR TH', ownerName: 'คุณธนวัฒน์', bankAcc: '098-7-65432-1', bankAccName: 'คุณธนวัฒน์' }
                 ],
 
-                // ฐานข้อมูลติดตามร้านค้า (เก็บรายชื่อร้านที่ผู้ใช้คนนี้กดติดตาม)
                 followingStores: [],
-
-                // ฐานข้อมูลรีวิวร้านค้า
                 storeReviews: {
-                    'OCEAN PEARL': [
-                        { user: 'คุณบี', rating: 5, comment: 'ปลากัดแข็งแรงมาก สีตรงปก ห่อมาดีเยี่ยมครับ' },
-                        { user: 'คุณนัท', rating: 4.5, comment: 'ส่งไว ปลาสวยงามสมราคา' }
-                    ],
-                    'Green House': [
-                        { user: 'คุณแจน', rating: 5, comment: 'ต้นไม้งามมาก ด่างสวยตามรูปเลย' }
+                    'AquaScape Pro': [
+                        { user: 'คุณบี', rating: 5, comment: 'ขอนไม้สวยมาก จัดตู้แล้วเด่นสุดๆ ครับ' }
                     ]
                 },
-
                 newReview: { rating: 5, comment: '' },
 
+                // สินค้าตัวอย่าง เน้น "ของแต่งตู้ปลา" 10 รายการ
                 products: [
-                    { id: 1, storeName: 'OCEAN PEARL', title: 'ปลากัด ฮาล์ฟมูน พรีเมียม (Betta Fish)', desc: 'สีน้ำเงินตัดแดง หางฟูสวย แข็งแรง กินเก่ง', price: 450, images: ['https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?q=80&w=800&auto=format&fit=crop'] },
-                    { id: 2, storeName: 'Green House', title: 'ต้นมอนสเตอร่า ด่างมิ้นท์ (ไซส์อนุบาล)', desc: 'ด่างสวย รากเดินดีแล้ว ปลอดแมลงศัตรูพืช', price: 1200, images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?q=80&w=800&auto=format&fit=crop'] },
-                    { id: 3, storeName: 'Aqua World', title: 'ปลาปักเป้าแคระ (Dwarf Puffer)', desc: 'ไซส์กำลังน่ารัก ช่วยกำจัดหอยในตู้ไม้น้ำได้ดีเยี่ยม', price: 120, images: ['https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?q=80&w=800&auto=format&fit=crop'] },
-                    { id: 4, storeName: 'Exotic Pet TH', title: 'กิ้งก่าคาดาร์ (Bearded Dragon)', desc: 'เชื่อง สุขภาพแข็งแรง กินเก่ง เหมาะสำหรับมือใหม่', price: 2500, images: ['https://images.unsplash.com/photo-1508265434106-d664a737f07a?q=80&w=800&auto=format&fit=crop'] }
+                    { id: 1, storeName: 'AquaScape Pro', title: 'ขอนไม้เรดบิวทรงสวย สำหรับจัดตู้ปลา', desc: 'ขอนไม้แท้จมน้ำแล้ว แต่งตู้ปลาสวยงามเป็นธรรมชาติ', price: 350, images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=800&auto=format&fit=crop'] },
+                    { id: 2, storeName: 'Rock & Stone', title: 'หินมังกรจัดตู้ปลา (Dragon Stone) ชุด 5 กก.', desc: 'หินรูพรุนสวยงาม ปลอดภัยต่อน้ำและปลา', price: 290, images: ['https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?q=80&w=800&auto=format&fit=crop'] },
+                    { id: 3, storeName: 'Plant & Tank', title: 'อนูเบียสพันขอนไม้ (Anubias on Driftwood)', desc: 'ไม้น้ำเลี้ยงง่าย ไม่ต้องใช้คาร์บอนก็โตได้ดี', price: 220, images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?q=80&w=800&auto=format&fit=crop'] },
+                    { id: 4, storeName: 'Cave Master', title: 'บ้านปูนปั้นซ่อนตัวปลา (ทรงขอนไม้โบราณ)', desc: 'เซรามิกปลอดภัย สำหรับให้ปลาหมอหรือกุ้งหลบซ่อน', price: 150, images: ['https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=800&auto=format&fit=crop'] },
+                    { id: 5, storeName: 'Aqua Decor', title: 'ทรายแม่น้ำธรรมชาติสำหรับปูพื้นตู้ปลา (5 กก.)', desc: 'ทรายสะอาด ผ่านการล้างฆ่าเชื้อแล้ว', price: 180, images: ['https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?q=80&w=800&auto=format&fit=crop'] },
+                    { id: 6, storeName: 'Green Substrate', title: 'ดินปลูกไม้น้ำแร่ธาตุสูง (Aqua Soil 9L)', desc: 'ช่วยปรับสภาพน้ำให้อ่อน เหมาะกับไม้น้ำและกุ้งแคระ', price: 550, images: ['https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=800&auto=format&fit=crop'] },
+                    { id: 7, storeName: 'Nano Tank Club', title: 'ชุดไฟ LED ขอบตู้ปลา แสงคัลเลอร์ฟูล', desc: 'ช่วยขับสีปลาให้เด่นชัดและช่วยสังเคราะห์แสงไม้น้ำ', price: 420, images: ['https://images.unsplash.com/photo-1508265434106-d664a737f07a?q=80&w=800&auto=format&fit=crop'] },
+                    { id: 8, storeName: 'Bubble Maker', title: 'ชุดหัวทรายออกซิเจนทรงภูเขาไฟพ่นฟอง', desc: 'เพิ่มออกซิเจนในตู้ พร้อมไฟ LED สวยงามยามค่ำคืน', price: 280, images: ['https://images.unsplash.com/photo-1509423350716-97f9360b4e09?q=80&w=800&auto=format&fit=crop'] },
+                    { id: 9, storeName: 'Moss Land', title: 'สไบมอสพันตะแกรงสแตนเลส (Christmas Moss)', desc: 'เขียวชะอุ่ม ปูพื้นตู้ปลาสวยงามเหมือนพรมธรรมชาติ', price: 190, images: ['https://images.unsplash.com/photo-1485955900006-10f4d324d411?q=80&w=800&auto=format&fit=crop'] },
+                    { id: 10, storeName: 'Tank Styling', title: 'ฉากหลังตู้ปลาแบบสติ๊กเกอร์กันน้ำ (ลายใต้น้ำ)', desc: 'สีสันคมชัด ช่วยให้ตู้ปลาดูมีมิติและสวยงามยิ่งขึ้น', price: 120, images: ['https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?q=80&w=800&auto=format&fit=crop'] }
                 ],
 
                 vendorForm: { storeName: '', ownerName: '', bankAcc: '', bankAccName: '' },
-                productForm: { title: '', price: '', desc: '', imagesInput: '' },
+                
+                // ฟอร์มลงขายรองรับการอัปโหลดไฟล์รูปภาพจากแกลเลอลี่
+                productForm: { title: '', price: '', desc: '', images: [] },
 
                 activeChatStore: '',
                 activeChatProduct: '',
                 newMessage: '',
                 chatMessages: [],
 
-                // ฟังก์ชันเช็คว่าติดตามร้านนี้หรือยัง
-                isFollowing(storeName) {
-                    return this.followingStores.includes(storeName);
+                // ฟังก์ชันอัปโหลดไฟล์รูปภาพจริงจากแกลเลอลี่
+                handleImageUpload(event) {
+                    const files = event.target.files;
+                    this.productForm.images = [];
+                    for (let i = 0; i < Math.min(files.length, 5); i++) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.productForm.images.push(e.target.result);
+                        };
+                        reader.readAsDataURL(files[i]);
+                    }
                 },
 
-                // ฟังก์ชันกดติดตาม / เลิกติดตาม
+                isFollowing(storeName) { return this.followingStores.includes(storeName); },
                 toggleFollow(storeName) {
-                    if(!this.currentUser) {
-                        alert('กรุณาเข้าสู่ระบบก่อนกดติดตามร้านค้าครับ');
-                        this.showLoginModal = true;
-                        return;
-                    }
+                    if(!this.currentUser) { alert('กรุณาเข้าสู่ระบบก่อนครับ'); this.showLoginModal = true; return; }
                     let index = this.followingStores.indexOf(storeName);
-                    if(index > -1) {
-                        this.followingStores.splice(index, 1);
-                        alert(`เลิกติดตามร้าน ${storeName} แล้ว`);
-                    } else {
-                        this.followingStores.push(storeName);
-                        alert(`❤️ ติดตามร้าน ${storeName} สำเร็จ!`);
-                    }
+                    if(index > -1) { this.followingStores.splice(index, 1); alert(`เลิกติดตาม ${storeName} แล้ว`); }
+                    else { this.followingStores.push(storeName); alert(`❤️ ติดตามร้าน ${storeName} สำเร็จ!`); }
                 },
 
-                // คำนวณคะแนนดาวเฉลี่ยของร้าน
                 getStoreRating(storeName) {
                     let reviews = this.storeReviews[storeName] || [];
                     if(reviews.length === 0) return '5.0';
                     let sum = reviews.reduce((acc, r) => acc + r.rating, 0);
                     return (sum / reviews.length).toFixed(1);
                 },
+                getStoreReviewsCount(storeName) { return (this.storeReviews[storeName] || []).length; },
+                getStoreReviews(storeName) { return (this.storeReviews[storeName] || []); },
 
-                getStoreReviewsCount(storeName) {
-                    return (this.storeReviews[storeName] || []).length;
-                },
-
-                getStoreReviews(storeName) {
-                    return this.storeReviews[storeName] || [];
-                },
-
-                // ส่งรีวิวใหม่
                 submitReview() {
-                    if(!this.currentUser) return alert('กรุณาเข้าสู่ระบบก่อนเขียนรีวิว');
-                    if(!this.newReview.comment.trim()) return alert('กรุณากรอกข้อความรีวิวครับ');
-
-                    if(!this.storeReviews[this.activeChatStore]) {
-                        this.storeReviews[this.activeChatStore] = [];
-                    }
-
-                    this.storeReviews[this.activeChatStore].unshift({
-                        user: this.currentUser,
-                        rating: Number(this.newReview.rating),
-                        comment: this.newReview.comment
-                    });
-
+                    if(!this.currentUser) return alert('กรุณาเข้าสู่ระบบก่อนรีวิว');
+                    if(!this.newReview.comment.trim()) return alert('กรุณากรอกข้อความรีวิว');
+                    if(!this.storeReviews[this.activeChatStore]) this.storeReviews[this.activeChatStore] = [];
+                    this.storeReviews[this.activeChatStore].unshift({ user: this.currentUser, rating: Number(this.newReview.rating), comment: this.newReview.comment });
                     alert('ขอบคุณสำหรับรีวิวครับ!');
                     this.newReview.comment = '';
                 },
 
                 loginAsUser() {
-                    if(!this.loginInput) return alert('กรุณากรอกอีเมลหรือเบอร์โทรครับ');
+                    if(!this.loginInput) return alert('กรุณากรอกอีเมลหรือเบอร์โทร');
                     this.currentUser = this.loginInput;
                     this.userRole = 'user';
                     this.showLoginModal = false;
@@ -410,9 +410,7 @@
                         this.userRole = 'admin';
                         this.showLoginModal = false;
                         this.currentTab = 'admin-panel';
-                    } else if(password !== null) {
-                        alert('❌ รหัสผ่านแอดมินไม่ถูกต้อง!');
-                    }
+                    } else if(password !== null) { alert('❌ รหัสผ่านไม่ถูกต้อง!'); }
                 },
 
                 goToVendorRegister() {
@@ -423,20 +421,17 @@
                 },
 
                 logout() {
-                    this.currentUser = null;
-                    this.userRole = 'guest';
-                    this.vendorStatus = 'none';
-                    this.currentTab = 'home';
+                    this.currentUser = null; this.userRole = 'guest'; this.vendorStatus = 'none'; this.currentTab = 'home';
                 },
 
                 submitVendorRegistration() {
                     if(this.vendorForm.bankAccName !== this.vendorForm.ownerName) {
-                        alert('⚠️ ชื่อบัญชีธนาคารต้องตรงกับชื่อเจ้าของร้านเท่านั้นครับ!');
+                        alert('⚠️ ชื่อบัญชีธนาคารต้องตรงกับชื่อเจ้าของร้านเท่านั้น!');
                         return;
                     }
                     this.pendingVendors.push({...this.vendorForm});
                     this.vendorStatus = 'pending';
-                    alert('ส่งข้อมูลเรียบร้อย! กรุณารอแอดมินตรวจสอบ');
+                    alert('ส่งข้อมูลเรียบร้อย! รอแอดมินตรวจสอบ');
                     this.vendorForm = { storeName: '', ownerName: '', bankAcc: '', bankAccName: '' };
                     this.currentTab = 'home';
                 },
@@ -448,15 +443,19 @@
                     alert('อนุมัติร้านค้าสำเร็จ!');
                 },
 
-                rejectVendor(index) {
-                    this.pendingVendors.splice(index, 1);
-                    alert('ปฏิเสธคำขอเรียบร้อย');
+                rejectVendor(index) { this.pendingVendors.splice(index, 1); alert('ปฏิเสธคำขอเรียบร้อย'); },
+
+                // ฟังก์ชันแอดมินลบสินค้า
+                deleteProduct(index) {
+                    if(confirm('คุณต้องการลบสินค้านี้ออกจากระบบใช่หรือไม่?')) {
+                        this.products.splice(index, 1);
+                        alert('ลบสินค้าสำเร็จเรียบร้อย');
+                    }
                 },
 
                 submitProduct() {
-                    let imgs = this.productForm.imagesInput.split(',').map(s => s.trim()).filter(s => s);
-                    if(imgs.length < 1 || imgs.length > 5) {
-                        alert('กรุณาใส่ลิงก์รูปภาพ 1-5 รูปครับ');
+                    if(this.productForm.images.length === 0) {
+                        alert('กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูปครับ');
                         return;
                     }
                     this.products.unshift({
@@ -465,46 +464,29 @@
                         title: this.productForm.title,
                         desc: this.productForm.desc,
                         price: Number(this.productForm.price),
-                        images: imgs
+                        images: [...this.productForm.images]
                     });
                     alert('ลงขายสินค้าสำเร็จ!');
-                    this.productForm = { title: '', price: '', desc: '', imagesInput: '' };
+                    this.productForm = { title: '', price: '', desc: '', images: [] };
                     this.currentTab = 'home';
                 },
 
                 openChat(item) {
-                    if(!this.currentUser) {
-                        alert("กรุณาเข้าสู่ระบบก่อนครับ");
-                        this.showLoginModal = true;
-                        return;
-                    }
+                    if(!this.currentUser) { alert('กรุณาเข้าสู่ระบบก่อนสั่งซื้อ'); this.showLoginModal = true; return; }
                     this.activeChatStore = item.storeName;
                     this.activeChatProduct = item.title;
-                    
-                    this.chatMessages = [
-                        { sender: 'ระบบอัตโนมัติ', text: '⚠️ โปรดตรวจสอบบัญชีโอนเงินเสมอ' }
-                    ];
-
+                    this.chatMessages = [{ sender: 'ระบบอัตโนมัติ', text: '⚠️ โปรดตรวจสอบบัญชีโอนเงินให้ตรงกับชื่อร้านค้าเสมอ' }];
                     let orderText = `🛒 สนใจสั่งซื้อ: ${item.title}\n💵 ราคา: ${item.price.toLocaleString()} บาท\n📍 รบกวนร้านค้าแจ้งยอดรวมส่งและเลขบัญชีครับ`;
                     this.chatMessages.push({ sender: this.currentUser, text: orderText });
-
                     this.currentTab = 'chat';
-                    
-                    setTimeout(() => {
-                        let chatBox = document.getElementById('chatContainer');
-                        if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-                    }, 100);
+                    setTimeout(() => { let box = document.getElementById('chatContainer'); if(box) box.scrollTop = box.scrollHeight; }, 100);
                 },
 
                 sendChatMessage() {
                     if(!this.newMessage.trim()) return;
-                    this.chatMessages.push({ sender: this.currentUser || 'คุณ (ผู้ซื้อ)', text: this.newMessage });
+                    this.chatMessages.push({ sender: this.currentUser || 'คุณ', text: this.newMessage });
                     this.newMessage = '';
-                    
-                    setTimeout(() => {
-                        let chatBox = document.getElementById('chatContainer');
-                        if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-                    }, 50);
+                    setTimeout(() => { let box = document.getElementById('chatContainer'); if(box) box.scrollTop = box.scrollHeight; }, 50);
                 }
             }
         }
