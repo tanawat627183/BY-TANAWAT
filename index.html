@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioMarket - ตลาดซื้อขายสิ่งมีชีวิตออนไลน์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1D4ED8', // น้ำเงิน
+                        accent: '#DC2626',  // แดง
+                        darkbg: '#0F172A',
+                    }
+                }
+            }
+        }
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans" x-data="marketplaceApp()">
+
+    <!-- Navbar -->
+    <header class="bg-primary text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2 cursor-pointer" @click="currentTab = 'home'">
+                <span class="text-2xl font-black tracking-wider">BIO<span class="text-accent">MARKET</span></span>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <template x-if="!currentUser">
+                    <button @click="showLoginModal = true" class="bg-accent hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">
+                        เข้าสู่ระบบ / เปิดร้าน
+                    </button>
+                </template>
+                
+                <template x-if="currentUser">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm bg-blue-900 px-3 py-1 rounded-full shadow-inner" x-text="'👤 ' + currentUser"></span>
+                        
+                        <template x-if="userRole === 'vendor' && vendorStatus === 'approved'">
+                            <button @click="currentTab = 'post-product'" class="bg-accent hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow">
+                                + ลงขายสิ่งมีชีวิต
+                            </button>
+                        </template>
+
+                        <template x-if="userRole === 'admin'">
+                            <button @click="currentTab = 'admin-panel'" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow">
+                                ⚙️ จัดการระบบ
+                            </button>
+                        </template>
+
+                        <button @click="logout()" class="text-xs bg-white/20 hover:bg-white/30 px-2 py-1.5 rounded transition">ออกระบบ</button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </header>
+
+    <div class="bg-red-50 border-b border-red-200 text-accent text-xs py-2 text-center font-medium shadow-sm">
+        ⚠️ ประกาศ: การลงทะเบียนร้านค้า ชื่อบัญชีรับเงินต้องตรงกับชื่อผู้ขายจริงเท่านั้น เพื่อความปลอดภัยในการซื้อขาย
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-6">
+
+        <!-- 1. หน้าแรก (Home) -->
+        <div x-show="currentTab === 'home'" x-transition>
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-slate-900">อัปเดตสิ่งมีชีวิตล่าสุด</h1>
+                <div class="text-sm font-medium text-primary bg-blue-50 px-3 py-1 rounded-full" x-text="products.length + ' รายการ'"></div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                <template x-for="item in products" :key="item.id">
+                    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
+                        <div class="relative">
+                            <img :src="item.images[0]" class="w-full h-52 object-cover bg-slate-100" alt="รูปสินค้า">
+                            <div class="absolute top-2 right-2 bg-white/90 text-xs font-bold px-2 py-1 rounded text-primary shadow" x-text="item.storeName"></div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-slate-800 truncate text-lg" x-text="item.title"></h3>
+                            <p class="text-xs text-slate-500 mt-1 line-clamp-2" x-text="item.desc"></p>
+                            <div class="text-accent font-black text-xl mt-3" x-text="item.price.toLocaleString() + ' ฿'"></div>
+                            
+                            <button @click="openChat(item)" class="mt-4 w-full bg-primary hover:bg-blue-800 text-white py-2.5 rounded-lg text-sm font-bold shadow-md transition flex items-center justify-center space-x-2">
+                                <span>💬 ทักแชทซื้อเลย</span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- 2. หน้าลงทะเบียนร้าน (Register Vendor) -->
+        <div x-show="currentTab === 'register-vendor'" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-lg border border-slate-100" x-transition>
+            <h2 class="text-2xl font-bold text-primary mb-2">ลงทะเบียนเปิดร้านค้า</h2>
+            <p class="text-sm text-slate-500 mb-6">รอแอดมินตรวจสอบเพื่อความปลอดภัยของแพลตฟอร์ม</p>
+            
+            <form @submit.prevent="submitVendorRegistration()">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">ชื่อร้านค้าของคุณ</label>
+                        <input type="text" x-model="vendorForm.storeName" required class="w-full border-2 border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">ชื่อ-นามสกุลจริง (เจ้าของร้าน)</label>
+                        <input type="text" x-model="vendorForm.ownerName" required class="w-full border-2 border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:outline-none transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">เลขที่บัญชีธนาคาร</label>
+                        <input type="text" x-model="vendorForm.bankAcc" required class="w-full border-2 border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:outline-none transition" placeholder="เช่น 123-4-56789-0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">ชื่อบัญชีธนาคาร <span class="text-accent">*ต้องตรงกับชื่อผู้ขาย</span></label>
+                        <input type="text" x-model="vendorForm.bankAccName" required class="w-full border-2 border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:outline-none transition">
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white py-3 mt-2 rounded-lg font-bold shadow-md hover:bg-blue-800 transition">ส่งข้อมูลขออนุมัติ</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 3. หน้าลงขายสินค้า (Post Product) -->
+        <div x-show="currentTab === 'post-product'" class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-slate-100" x-transition>
+            <h2 class="text-2xl font-bold text-accent mb-2">ลงขายสิ่งมีชีวิต</h2>
+            <p class="text-sm text-slate-500 mb-6">ระบุรายละเอียดให้ชัดเจน (อัปโหลดรูปได้ 1-5 รูป)</p>
+            
+            <form @submit.prevent="submitProduct()">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">ชื่อสิ่งมีชีวิต</label>
+                        <input type="text" x-model="productForm.title" required class="w-full border-2 border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">ราคา (บาท)</label>
+                        <input type="number" x-model="productForm.price" required class="w-full border-2 border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">รายละเอียด (สายพันธุ์, ขนาด, ตำหนิ)</label>
+                        <textarea x-model="productForm.desc" rows="4" required class="w-full border-2 border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">ลิงก์รูปภาพ (คั่นด้วยเครื่องหมายจุลภาค , )</label>
+                        <input type="text" x-model="productForm.imagesInput" required placeholder="เช่น https://img1.jpg, https://img2.jpg" class="w-full border-2 border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:border-primary focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-accent text-white py-3 mt-2 rounded-lg font-bold shadow-md hover:bg-red-700 transition">โพสต์ขายทันที</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 4. ห้องแชท (Chat Room) -->
+        <div x-show="currentTab === 'chat'" class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-[600px]" x-transition>
+            <div class="bg-primary text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <div class="font-bold text-lg" x-text="'ร้าน: ' + activeChatStore"></div>
+                    <div class="text-sm text-blue-200" x-text="'กำลังสอบถาม: ' + activeChatProduct"></div>
+                </div>
+                <button @click="currentTab = 'home'" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg text-sm font-medium transition">← กลับตลาด</button>
+            </div>
+            
+            <div class="flex-1 p-6 overflow-y-auto space-y-4 bg-slate-50">
+                <template x-for="msg in chatMessages">
+                    <div class="flex flex-col" :class="msg.sender === currentUser ? 'items-end' : 'items-start'">
+                        <div class="text-[11px] text-slate-400 mb-1 font-medium" x-text="msg.sender"></div>
+                        <div class="px-4 py-2.5 rounded-2xl max-w-md text-sm shadow-sm" :class="msg.sender === currentUser ? 'bg-primary text-white rounded-br-none' : 'bg-white text-slate-800 border rounded-bl-none'" x-text="msg.text"></div>
+                    </div>
+                </template>
+            </div>
+
+            <div class="p-4 bg-white border-t flex space-x-3 items-center">
+                <input type="text" x-model="newMessage" @keyup.enter="sendChatMessage()" placeholder="พิมพ์ข้อความที่นี่..." class="flex-1 border-2 border-slate-200 rounded-full px-5 py-2.5 text-sm focus:border-primary focus:outline-none">
+                <button @click="sendChatMessage()" class="bg-accent text-white px-6 py-2.5 rounded-full text-sm font-bold shadow hover:bg-red-700 transition">ส่งข้อความ</button>
+            </div>
+        </div>
+
+        <!-- 5. หลังบ้านแอดมิน (Admin Panel) -->
+        <div x-show="currentTab === 'admin-panel'" class="space-y-6 max-w-4xl mx-auto" x-transition>
+            <h2 class="text-2xl font-bold text-slate-900">⚙️ ระบบจัดการแอดมิน</h2>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">คำขอเปิดร้านค้า (รอตรวจสอบ)</h3>
+                <div class="space-y-4">
+                    <template x-for="(v, index) in pendingVendors" :key="index">
+                        <div class="p-4 border-2 border-slate-100 rounded-xl flex justify-between items-center bg-slate-50">
+                            <div>
+                                <div class="font-black text-lg text-primary" x-text="v.storeName"></div>
+                                <div class="text-sm text-slate-700 mt-1" x-text="'ชื่อผู้ขาย: ' + v.ownerName"></div>
+                                <div class="text-sm text-slate-700" x-text="'เลขบัญชี: ' + v.bankAcc"></div>
+                                <div class="text-sm font-bold text-accent mt-1" x-text="'ชื่อบัญชี: ' + v.bankAccName"></div>
+                            </div>
+                            <div class="flex flex-col space-y-2">
+                                <button @click="approveVendor(index)" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 shadow">✅ อนุมัติร้าน</button>
+                                <button @click="rejectVendor(index)" class="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 shadow">❌ ไม่อนุมัติ</button>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="pendingVendors.length === 0">
+                        <div class="text-center py-8 text-slate-400 font-medium bg-slate-50 rounded-xl border-2 border-dashed">ไม่มีคำขอเปิดร้านในขณะนี้</div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal ล็อกอิน -->
+    <div x-show="showLoginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" x-transition>
+        <div class="bg-white p-8 rounded-2xl w-full max-w-sm shadow-2xl relative">
+            <button @click="showLoginModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold">✕</button>
+            <h3 class="text-xl font-bold mb-2 text-slate-900">เข้าสู่ระบบ / ลงทะเบียน</h3>
+            <p class="text-sm text-slate-500 mb-6">ใช้ E-mail หรือ เบอร์โทรศัพท์</p>
+            
+            <input type="text" x-model="loginInput" placeholder="กรอกข้อมูลที่นี่..." class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-sm mb-5 focus:border-primary focus:outline-none">
+            
+            <div class="space-y-3">
+                <button @click="loginAsUser()" class="w-full bg-primary text-white py-3 rounded-xl text-sm font-bold shadow hover:bg-blue-800 transition">เข้าสู่ระบบ (ในฐานะผู้ซื้อ)</button>
+                <button @click="goToVendorRegister()" class="w-full bg-accent text-white py-3 rounded-xl text-sm font-bold shadow hover:bg-red-700 transition">สมัครเป็นผู้ขาย (เปิดร้าน)</button>
+                <div class="pt-4 border-t border-slate-100">
+                    <button @click="loginAsAdmin()" class="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition">เข้าสู่ระบบหลังบ้านแอดมิน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script สำหรับการทำงาน -->
+    <script>
+        function marketplaceApp() {
+            return {
+                currentTab: 'home',
+                showLoginModal: false,
+                currentUser: null,
+                userRole: 'guest', 
+                vendorStatus: 'none', 
+                loginInput: '',
+                
+                pendingVendors: [
+                    { storeName: 'OCEAN PEARL', ownerName: 'คุณธนวัฒน์', bankAcc: '098-7-65432-1', bankAccName: 'คุณธนวัฒน์' }
+                ],
+
+                products: [
+                    { 
+                        id: 1, 
+                        storeName: 'OCEAN PEARL', 
+                        title: 'ปลากัด ฮาล์ฟมูน พรีเมียม (Betta Fish)', 
+                        desc: 'สีน้ำเงินตัดแดง หางฟูสวย แข็งแรง กินเก่ง พร้อมจัดส่งทั่วประเทศ',
+                        price: 450, 
+                        images: ['https://images.unsplash.com/photo-1534062479210-91a593306db7?auto=format&fit=crop&w=600&q=80'] 
+                    },
+                    { 
+                        id: 2, 
+                        storeName: 'Green House', 
+                        title: 'ต้นมอนสเตอร่า ด่างมิ้นท์ (ไซส์อนุบาล)', 
+                        desc: 'ด่างสวย รากเดินดีแล้ว ปลอดแมลงศัตรูพืช',
+                        price: 1200, 
+                        images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=600&q=80'] 
+                    }
+                ],
+
+                vendorForm: { storeName: '', ownerName: '', bankAcc: '', bankAccName: '' },
+                productForm: { title: '', price: '', desc: '', imagesInput: '' },
+
+                activeChatStore: '',
+                activeChatProduct: '',
+                newMessage: '',
+                chatMessages: [
+                    { sender: 'ระบบอัตโนมัติ', text: 'ยินดีต้อนรับเข้าสู่ห้องแชท กรุณาตกลงรายละเอียดและเช็คเครดิตก่อนโอนเงินทุกครั้ง' }
+                ],
+
+                loginAsUser() {
+                    if(!this.loginInput) return alert('กรุณากรอกอีเมลหรือเบอร์โทรครับ');
+                    this.currentUser = this.loginInput;
+                    this.userRole = 'user';
+                    this.showLoginModal = false;
+                    this.loginInput = '';
+                },
+
+                loginAsAdmin() {
+                    this.currentUser = 'Admin_Master';
+                    this.userRole = 'admin';
+                    this.showLoginModal = false;
+                    this.currentTab = 'admin-panel';
+                },
+
+                goToVendorRegister() {
+                    if(!this.loginInput) return alert('กรุณากรอกอีเมลหรือเบอร์โทรในฟอร์มก่อนครับ');
+                    this.currentUser = this.loginInput;
+                    this.showLoginModal = false;
+                    this.currentTab = 'register-vendor';
+                },
+
+                logout() {
+                    this.currentUser = null;
+                    this.userRole = 'guest';
+                    this.vendorStatus = 'none';
+                    this.currentTab = 'home';
+                },
+
+                submitVendorRegistration() {
+                    if(this.vendorForm.bankAccName !== this.vendorForm.ownerName) {
+                        alert('⚠️ ชื่อบัญชีธนาคารต้องตรงกับชื่อเจ้าของร้านเท่านั้นครับ!');
+                        return;
+                    }
+                    this.pendingVendors.push({...this.vendorForm});
+                    this.vendorStatus = 'pending';
+                    alert('ส่งข้อมูลเรียบร้อย! กรุณารอแอดมินตรวจสอบอนุมัติ');
+                    this.vendorForm = { storeName: '', ownerName: '', bankAcc: '', bankAccName: '' };
+                    this.currentTab = 'home';
+                },
+
+                approveVendor(index) {
+                    this.pendingVendors.splice(index, 1);
+                    this.vendorStatus = 'approved';
+                    this.userRole = 'vendor';
+                    alert('อนุมัติร้านค้าสำเร็จ!');
+                },
+
+                rejectVendor(index) {
+                    this.pendingVendors.splice(index, 1);
+                    alert('ไม่อนุมัติคำขอร้านค้านี้');
+                },
+
+                submitProduct() {
+                    let imgs = this.productForm.imagesInput.split(',').map(s => s.trim()).filter(s => s);
+                    if(imgs.length < 1 || imgs.length > 5) {
+                        alert('กรุณาใส่ลิงก์รูปภาพ 1-5 รูปครับ');
+                        return;
+                    }
+                    this.products.unshift({
+                        id: Date.now(),
+                        storeName: this.currentUser,
+                        title: this.productForm.title,
+                        desc: this.productForm.desc,
+                        price: Number(this.productForm.price),
+                        images: imgs
+                    });
+                    alert('ลงขายสินค้าสำเร็จ!');
+                    this.productForm = { title: '', price: '', desc: '', imagesInput: '' };
+                    this.currentTab = 'home';
+                },
+
+                openChat(item) {
+                    this.activeChatStore = item.storeName;
+                    this.activeChatProduct = item.title;
+                    this.currentTab = 'chat';
+                },
+
+                sendChatMessage() {
+                    if(!this.newMessage.trim()) return;
+                    this.chatMessages.push({ sender: this.currentUser || 'คุณ (ผู้ซื้อ)', text: this.newMessage });
+                    this.newMessage = '';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
