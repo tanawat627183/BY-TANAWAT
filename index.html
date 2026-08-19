@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioMarket - ตลาดซื้อขายสิ่งมีชีวิตออนไลน์</title>
+    <title>VERY RAY - ตลาดซื้อขายสิ่งมีชีวิตออนไลน์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -48,7 +48,7 @@
 
                         <template x-if="userRole === 'admin'">
                             <button @click="currentTab = 'admin-panel'" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow">
-                                ⚙️ จัดการระบบ
+                                ⚙️ จัดการระบบ (แอดมิน)
                             </button>
                         </template>
 
@@ -75,17 +75,20 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                 <template x-for="item in products" :key="item.id">
-                    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
-                        <div class="relative">
-                            <img :src="item.images[0]" class="w-full h-52 object-cover bg-slate-100" alt="รูปสินค้า">
-                            <div class="absolute top-2 right-2 bg-white/90 text-xs font-bold px-2 py-1 rounded text-primary shadow" x-text="item.storeName"></div>
+                    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300 flex flex-col justify-between">
+                        <div>
+                            <div class="relative">
+                                <img :src="item.images[0]" class="w-full h-52 object-cover bg-slate-100" alt="รูปสินค้า">
+                                <div class="absolute top-2 right-2 bg-white/90 text-xs font-bold px-2 py-1 rounded text-primary shadow" x-text="item.storeName"></div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-slate-800 truncate text-lg" x-text="item.title"></h3>
+                                <p class="text-xs text-slate-500 mt-1 line-clamp-2" x-text="item.desc"></p>
+                                <div class="text-accent font-black text-xl mt-3" x-text="item.price.toLocaleString() + ' ฿'"></div>
+                            </div>
                         </div>
-                        <div class="p-4">
-                            <h3 class="font-bold text-slate-800 truncate text-lg" x-text="item.title"></h3>
-                            <p class="text-xs text-slate-500 mt-1 line-clamp-2" x-text="item.desc"></p>
-                            <div class="text-accent font-black text-xl mt-3" x-text="item.price.toLocaleString() + ' ฿'"></div>
-                            
-                            <button @click="openChat(item)" class="mt-4 w-full bg-primary hover:bg-blue-800 text-white py-2.5 rounded-lg text-sm font-bold shadow-md transition flex items-center justify-center space-x-2">
+                        <div class="p-4 pt-0">
+                            <button @click="openChat(item)" class="w-full bg-primary hover:bg-blue-800 text-white py-2.5 rounded-lg text-sm font-bold shadow-md transition flex items-center justify-center space-x-2">
                                 <span>💬 ทักแชทซื้อเลย</span>
                             </button>
                         </div>
@@ -177,7 +180,7 @@
 
         <!-- 5. หลังบ้านแอดมิน (Admin Panel) -->
         <div x-show="currentTab === 'admin-panel'" class="space-y-6 max-w-4xl mx-auto" x-transition>
-            <h2 class="text-2xl font-bold text-slate-900">⚙️ ระบบจัดการแอดมิน</h2>
+            <h2 class="text-2xl font-bold text-slate-900">⚙️ ระบบจัดการแอดมิน (ปลอดภัยสูงสุด)</h2>
             
             <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
                 <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">คำขอเปิดร้านค้า (รอตรวจสอบ)</h3>
@@ -215,10 +218,10 @@
             <input type="text" x-model="loginInput" placeholder="กรอกข้อมูลที่นี่..." class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-sm mb-5 focus:border-primary focus:outline-none">
             
             <div class="space-y-3">
-                <button @click="loginAsUser()" class="w-full bg-primary text-white py-3 rounded-xl text-sm font-bold shadow hover:bg-blue-800 transition">เข้าสู่ระบบ (ในฐานะผู้ซื้อ)</button>
+                <button @click="loginAsUser()" class="w-full bg-primary text-white py-3 rounded-xl text-sm font-bold shadow hover:bg-blue-800 transition">เข้าสู่ระบบ (ผู้ซื้อทั่วไป)</button>
                 <button @click="goToVendorRegister()" class="w-full bg-accent text-white py-3 rounded-xl text-sm font-bold shadow hover:bg-red-700 transition">สมัครเป็นผู้ขาย (เปิดร้าน)</button>
                 <div class="pt-4 border-t border-slate-100">
-                    <button @click="loginAsAdmin()" class="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition">เข้าสู่ระบบหลังบ้านแอดมิน</button>
+                    <button @click="loginAsAdmin()" class="w-full bg-slate-800 text-white py-2.5 rounded-xl text-sm font-bold shadow hover:bg-slate-900 transition">🔐 เข้าสู่ระบบแอดมิน (ใส่รหัสผ่าน)</button>
                 </div>
             </div>
         </div>
@@ -239,6 +242,7 @@
                     { storeName: 'OCEAN PEARL', ownerName: 'คุณธนวัฒน์', bankAcc: '098-7-65432-1', bankAccName: 'คุณธนวัฒน์' }
                 ],
 
+                // รายการสินค้าตัวอย่าง 10 รายการ
                 products: [
                     { 
                         id: 1, 
@@ -255,6 +259,70 @@
                         desc: 'ด่างสวย รากเดินดีแล้ว ปลอดแมลงศัตรูพืช',
                         price: 1200, 
                         images: ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=600&q=80'] 
+                    },
+                    { 
+                        id: 3, 
+                        storeName: 'Aqua World', 
+                        title: 'ปลาปักเป้าแคระ (Dwarf Puffer)', 
+                        desc: 'ไซส์กำลังน่ารัก ช่วยกำจัดหอยในตู้ไม้น้ำได้ดีเยี่ยม',
+                        price: 120, 
+                        images: ['https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=600&q=80'] 
+                    },
+                    { 
+                        id: 4, 
+                        storeName: 'Exotic Pet TH', 
+                        title: 'กิ้งก่าคาดาร์ (Bearded Dragon)', 
+                        desc: 'เชื่อง สุขภาพแข็งแรง กินเก่ง เหมาะสำหรับมือใหม่',
+                        price: 2500, 
+                        images: ['https://images.unsplash.com/photo-1508265434106-d664a737f07a?auto=format&fit=crop&w=600&q=80'] 
+                    },
+                    { 
+                        id: 5, 
+                        storeName: 'Plant Lover', 
+                        title: 'ฟิโลเดนดรอน พิงค์ปรินเซส (Pink Princess)', 
+                        desc: 'ด่างชมพูสวยหวาน ลุ้นใบต่อไปชัดเจน',
+                        price: 890, 
+                        images: ['https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=600&q=80'] 
+                    },
+                    { 
+                        id: 6, 
+                        storeName: 'Goldfish Farm', 
+                        title: 'ปลาทองรันชู หัววุ้นใหญ่ ไซส์ประกวด', 
+                        desc: 'ฟอร์มสวย หลังโค้งสวยงาม สมส่วน แข็งแรง',
+                        price: 1500, 
+                        images: ['https://images.unsplash.com/photo-1535591273668-578e31182c4f?auto=format&fit=crop&w=600&q=80'] 
+                    },
+                    { 
+                        id: 7, 
+                        storeName: 'Cactus Zone', 
+                        title: 'กระบองเพชร แอสโทรไฟตัม ซูเปอร์คาบุโตะ', 
+                        desc: 'ลายดอกสวย ชัดเจน ไม้เมล็ดแท้ ฟอร์มกลมสวย',
+                        price: 350, 
+                        images: ['https://images.unsplash.com/photo-1509423350716-97f9360b4e09?auto=format&fit=crop&w=600&q=80'] 
+                    },
+                    { 
+                        id: 8, 
+                        storeName: 'Jungle Reptile', 
+                        title: 'งูบอลพอน มอร์ส ส้มสดใส (Ball Python)', 
+                        desc: 'กินเก่ง ลอกคราบปกติ เชื่อง ไม่ดุร้าย',
+                        price: 3800, 
+                        images: ['https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?auto=format&fit=crop&w=600&q=80'] 
+                    },
+                    { 
+                        id: 9, 
+                        storeName: 'Betta Hub', 
+                        title: 'ปลากัดคาร์บอน (Koi Galaxy Multi-color)', 
+                        desc: 'สีสันสดใส ลายชัดเจน เครื่องครีบสมบูรณ์',
+                        price: 300, 
+                        images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80'] 
+                    },
+                    { 
+                        id: 10, 
+                        storeName: 'Rare Tree TH', 
+                        title: 'ต้นบอนสี  (Khatiya)', 
+                        desc: 'ไม้ฟอร์มกอ กัดสีสวยเด่นชัด หลอดใหม่สมบูรณ์',
+                        price: 650, 
+                        images: ['https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=600&q=80'] 
                     }
                 ],
 
@@ -277,10 +345,17 @@
                 },
 
                 loginAsAdmin() {
-                    this.currentUser = 'Admin_Master';
-                    this.userRole = 'admin';
-                    this.showLoginModal = false;
-                    this.currentTab = 'admin-panel';
+                    let password = prompt('🔑 กรุณากรอกรหัสผ่านแอดมิน:');
+                    // ตั้งรหัสผ่านแอดมินเป็น admin030945 ตามที่คุณต้องการ
+                    if(password === 'admin030945') {
+                        this.currentUser = 'Admin_Master';
+                        this.userRole = 'admin';
+                        this.showLoginModal = false;
+                        this.currentTab = 'admin-panel';
+                        alert('เข้าสู่ระบบแอดมินสำเร็จ!');
+                    } else if(password !== null) {
+                        alert('❌ รหัสผ่านแอดมินไม่ถูกต้อง!');
+                    }
                 },
 
                 goToVendorRegister() {
