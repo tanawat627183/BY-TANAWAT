@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ขายดิMarket - ตลาดสัตว์</title>
+    <title>ร้อยล้านMarket - แพลตฟอร์มซื้อ-ขายสัตว์และอุปกรณ์ออนไลน์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        forestPrimary: '#1E5631', // เขียวเข้มหลัก (เฉด 7549/7533)
-                        forestDark: '#143820',    // เขียวเข้มพิเศษ (เฉด 8357)
-                        forestLight: '#E8F5E9',   // เขียวอ่อนพาสเทลสำหรับพื้นหลัง
-                        forestAccent: '#2E7D32',  // เขียวสดสำหรับปุ่ม
-                        forestBg: '#F4F7F4',      // พื้นหลังเว็บเทาปนเขียวอ่อนธรรมชาติ
+                        kaideeBlue: '#0A2540',  // น้ำเงินเข้มแบบ Kaidee
+                        kaideeAccent: '#F37021',// ส้มไฮไลท์
+                        forestPrimary: '#1E5631',// เขียวธรรมชาติที่คุณเลือก
+                        forestBg: '#F4F7F4',    
                     },
                     boxShadow: {
-                        'forest': '0 1px 3px 0 rgba(30, 86, 49, 0.1)',
-                        'forest-card': '0 4px 12px 0 rgba(30, 86, 49, 0.08)',
+                        'kaidee': '0 1px 3px rgba(0,0,0,0.1)',
+                        'kaidee-card': '0 2px 8px rgba(0,0,0,0.08)',
                     }
                 }
             }
@@ -28,18 +27,18 @@
 </head>
 <body class="bg-forestBg text-slate-800 font-sans antialiased" x-data="marketplaceApp()">
 
-    <!-- 🌿 Header โทนสีเขียวธรรมชาติ -->
-    <header class="bg-gradient-to-r from-forestPrimary to-forestDark text-white sticky top-0 z-50 shadow-md">
+    <!-- 🌐 Header สไตล์ Kaidee -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-kaidee">
         <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
             <!-- โลโก้ -->
             <div class="flex items-center space-x-2 cursor-pointer flex-shrink-0" @click="currentTab = 'home'; selectedCategory = 'all'">
-                <span class="text-2xl sm:text-3xl font-black tracking-wider text-white">ขายดิ<span class="text-emerald-300">Market</span></span>
+                <span class="text-2xl sm:text-3xl font-black tracking-tight text-kaideeBlue">ร้อยล้าน<span class="text-forestPrimary">Market</span></span>
             </div>
             
-            <!-- ช่องค้นหาสินค้า -->
-            <div class="flex-1 max-w-2xl hidden sm:flex bg-white rounded-lg p-1 shadow-sm">
-                <input type="text" x-model="searchKeyword" placeholder="ค้นหาสัตว์, อุปกรณ์, ของตกแต่ง..." class="w-full px-3.5 py-1.5 text-sm text-slate-800 outline-none">
-                <button class="bg-forestPrimary hover:bg-forestDark text-white px-6 py-1.5 rounded-md flex items-center justify-center transition">
+            <!-- ช่องค้นหาตรงกลาง -->
+            <div class="flex-1 max-w-2xl hidden md:flex items-center bg-slate-100 border border-slate-300 rounded-lg overflow-hidden focus-within:border-kaideeBlue">
+                <input type="text" x-model="searchKeyword" placeholder="ค้นหาสัตว์, อุปกรณ์, ของตกแต่งตู้ปลา..." class="w-full px-4 py-2.5 text-sm bg-transparent outline-none">
+                <button class="bg-kaideeBlue text-white px-6 py-2.5 flex items-center justify-center hover:bg-slate-900 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -49,99 +48,110 @@
             <!-- เมนูด้านขวา -->
             <div class="flex items-center space-x-3 flex-shrink-0">
                 <template x-if="!currentUser">
-                    <button @click="showLoginModal = true" class="bg-white text-forestPrimary hover:bg-emerald-50 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold shadow transition">
-                        เข้าสู่ระบบ / สมัครร้านค้า
+                    <button @click="showLoginModal = true" class="text-sm font-bold text-slate-700 hover:text-kaideeBlue px-3 py-2 transition">
+                        เข้าสู่ระบบ / สมัครสมาชิก
                     </button>
                 </template>
                 
                 <template x-if="currentUser">
                     <div class="flex items-center space-x-2">
-                        <span class="text-xs bg-black/20 px-3 py-1.5 rounded-lg font-bold text-white hidden sm:inline-block" x-text="'ผู้ขาย: ' + currentUser"></span>
+                        <span class="text-xs bg-slate-100 px-3 py-1.5 rounded-lg font-bold text-slate-700 hidden sm:inline-block" x-text="'ผู้ขาย: ' + currentUser"></span>
                         
-                        <template x-if="userRole === 'vendor' && vendorStatus === 'approved'">
-                            <button @click="currentTab = 'post-product'" class="bg-emerald-400 hover:bg-emerald-500 text-slate-900 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold shadow transition">
-                                ➕ เพิ่มสินค้า
-                            </button>
-                        </template>
-
                         <template x-if="userRole === 'admin'">
-                            <button @click="currentTab = 'admin-panel'" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold shadow transition">
+                            <button @click="currentTab = 'admin-panel'" class="bg-slate-800 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition">
                                 ⚙️ แอดมิน
                             </button>
                         </template>
 
-                        <button @click="logout()" class="text-xs bg-white/20 hover:bg-white/30 px-2.5 py-1.5 rounded-lg transition">ออก</button>
+                        <button @click="logout()" class="text-xs bg-slate-200 hover:bg-slate-300 px-3 py-2 rounded-lg font-bold transition">ออก</button>
                     </div>
+                </template>
+
+                <!-- ปุ่มลงขายเด่นชัดสไตล์ Kaidee -->
+                <template x-if="!currentUser || (userRole === 'vendor' && vendorStatus === 'approved')">
+                    <button @click="handlePostClick()" class="bg-kaideeBlue hover:bg-slate-900 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow transition flex items-center space-x-1">
+                        <span>+ ลงขาย</span>
+                    </button>
                 </template>
             </div>
         </div>
     </header>
 
     <!-- 📢 แถบประกาศ -->
-    <div class="bg-emerald-50 border-b border-emerald-200 text-emerald-900 text-xs py-2.5 text-center font-bold">
-        ⚠️ คำแนะนำ: โปรดตรวจสอบชื่อบัญชีธนาคารของผู้ขายให้ถูกต้องตรงกันก่อนโอนเงินเพื่อความปลอดภัยสูงสุด
+    <div class="bg-amber-50 border-b border-amber-200 text-amber-900 text-xs py-2 text-center font-bold">
+        ⚠️ คำแนะนำสำหรับผู้ซื้อ: โปรดตรวจสอบชื่อบัญชีธนาคารให้ตรงกับชื่อผู้ขายก่อนโอนเงินทุกครั้ง
     </div>
 
     <!-- 📦 Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-6">
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
         <!-- 1. หน้าแรก (Home) -->
-        <div x-show="currentTab === 'home'" x-transition>
+        <div x-show="currentTab === 'home'" x-transition class="space-y-6">
             
-            <!-- หมวดหมู่สินค้า -->
-            <div class="bg-white p-6 rounded-2xl shadow-forest mb-6 border border-emerald-50">
-                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">📂 หมวดหมู่ยอดนิยม</h2>
-                <div class="grid grid-cols-3 sm:grid-cols-6 gap-4 text-center">
-                    <div @click="selectedCategory = 'all'" class="cursor-pointer group flex flex-col items-center space-y-2">
-                        <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl bg-emerald-50 group-hover:bg-emerald-100 transition border border-emerald-200">🌟</div>
-                        <span class="text-xs font-bold text-slate-700">ทั้งหมด</span>
+            <!-- แบนเนอร์พาดหัวสไตล์ Kaidee -->
+            <div class="bg-gradient-to-r from-kaideeBlue to-forestPrimary rounded-2xl text-white p-8 sm:p-12 shadow-kaidee-card text-center relative overflow-hidden">
+                <h1 class="text-2xl sm:text-4xl font-black mb-3">ซื้อ-ขาย ของออนไลน์ จบง่ายที่ ThaiMarket</h1>
+                <p class="text-sm sm:text-base text-emerald-100 max-w-xl mx-auto mb-6">ตลาดชุมชนออนไลน์สำหรับคนรักสัตว์และอุปกรณ์ ปลอดภัย ตรวจสอบได้โดยแอดมิน</p>
+                <div class="flex justify-center gap-6 text-xs font-bold text-emerald-200">
+                    <span class="flex items-center gap-1">🛡️ ตรวจสอบผู้ขาย</span>
+                    <span class="flex items-center gap-1">💬 แชทคุยในระบบ</span>
+                </div>
+            </div>
+
+            <!-- แถบหมวดหมู่สินค้าสไตล์ Kaidee (ไอคอนกล่องขาวสะอาดตา) -->
+            <div class="bg-white p-6 rounded-2xl shadow-kaidee border border-slate-200">
+                <h2 class="text-sm font-extrabold text-slate-700 uppercase tracking-wider mb-4">หมวดหมู่ยอดนิยม</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-6 gap-3 text-center">
+                    <div @click="selectedCategory = 'all'" class="cursor-pointer p-4 rounded-xl border transition flex flex-col items-center space-y-2 hover:border-kaideeBlue hover:shadow-sm" :class="selectedCategory === 'all' ? 'border-kaideeBlue bg-blue-50/50 text-kaideeBlue' : 'border-slate-200 bg-white'">
+                        <span class="text-3xl">🌟</span>
+                        <span class="text-xs font-bold">ทั้งหมด</span>
                     </div>
-                    <div @click="selectedCategory = 'สัตว์น้ำ'" class="cursor-pointer group flex flex-col items-center space-y-2">
-                        <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl bg-emerald-50 group-hover:bg-emerald-100 transition border border-emerald-200">🐟</div>
-                        <span class="text-xs font-bold text-slate-700">สัตว์น้ำ</span>
+                    <div @click="selectedCategory = 'สัตว์น้ำ'" class="cursor-pointer p-4 rounded-xl border transition flex flex-col items-center space-y-2 hover:border-kaideeBlue hover:shadow-sm" :class="selectedCategory === 'สัตว์น้ำ' ? 'border-kaideeBlue bg-blue-50/50 text-kaideeBlue' : 'border-slate-200 bg-white'">
+                        <span class="text-3xl">🐟</span>
+                        <span class="text-xs font-bold">สัตว์น้ำ</span>
                     </div>
-                    <div @click="selectedCategory = 'สัตว์บก'" class="cursor-pointer group flex flex-col items-center space-y-2">
-                        <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl bg-emerald-50 group-hover:bg-emerald-100 transition border border-emerald-200">🐅</div>
-                        <span class="text-xs font-bold text-slate-700">สัตว์บก</span>
+                    <div @click="selectedCategory = 'สัตว์บก'" class="cursor-pointer p-4 rounded-xl border transition flex flex-col items-center space-y-2 hover:border-kaideeBlue hover:shadow-sm" :class="selectedCategory === 'สัตว์บก' ? 'border-kaideeBlue bg-blue-50/50 text-kaideeBlue' : 'border-slate-200 bg-white'">
+                        <span class="text-3xl">🐅</span>
+                        <span class="text-xs font-bold">สัตว์บก</span>
                     </div>
-                    <div @click="selectedCategory = 'สัตว์ปีก'" class="cursor-pointer group flex flex-col items-center space-y-2">
-                        <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl bg-emerald-50 group-hover:bg-emerald-100 transition border border-emerald-200">🐓</div>
-                        <span class="text-xs font-bold text-slate-700">สัตว์ปีก</span>
+                    <div @click="selectedCategory = 'สัตว์ปีก'" class="cursor-pointer p-4 rounded-xl border transition flex flex-col items-center space-y-2 hover:border-kaideeBlue hover:shadow-sm" :class="selectedCategory === 'สัตว์ปีก' ? 'border-kaideeBlue bg-blue-50/50 text-kaideeBlue' : 'border-slate-200 bg-white'">
+                        <span class="text-3xl">🐓</span>
+                        <span class="text-xs font-bold">สัตว์ปีก</span>
                     </div>
-                    <div @click="selectedCategory = 'อุปกรณ์'" class="cursor-pointer group flex flex-col items-center space-y-2">
-                        <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl bg-emerald-50 group-hover:bg-emerald-100 transition border border-emerald-200">⚙️</div>
-                        <span class="text-xs font-bold text-slate-700">อุปกรณ์</span>
+                    <div @click="selectedCategory = 'อุปกรณ์'" class="cursor-pointer p-4 rounded-xl border transition flex flex-col items-center space-y-2 hover:border-kaideeBlue hover:shadow-sm" :class="selectedCategory === 'อุปกรณ์' ? 'border-kaideeBlue bg-blue-50/50 text-kaideeBlue' : 'border-slate-200 bg-white'">
+                        <span class="text-3xl">⚙️</span>
+                        <span class="text-xs font-bold">อุปกรณ์</span>
                     </div>
-                    <div @click="selectedCategory = 'ของตกแต่ง'" class="cursor-pointer group flex flex-col items-center space-y-2">
-                        <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl bg-emerald-50 group-hover:bg-emerald-100 transition border border-emerald-200">🪵</div>
-                        <span class="text-xs font-bold text-slate-700">ของตกแต่ง</span>
+                    <div @click="selectedCategory = 'ของตกแต่ง'" class="cursor-pointer p-4 rounded-xl border transition flex flex-col items-center space-y-2 hover:border-kaideeBlue hover:shadow-sm" :class="selectedCategory === 'ของตกแต่ง' ? 'border-kaideeBlue bg-blue-50/50 text-kaideeBlue' : 'border-slate-200 bg-white'">
+                        <span class="text-3xl">🪵</span>
+                        <span class="text-xs font-bold">ของตกแต่ง</span>
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-between items-center mb-4 px-1">
+            <div class="flex justify-between items-center px-1">
                 <h2 class="text-base font-bold text-slate-800" x-text="'รายการสินค้า: ' + selectedCategory + ' (' + filteredProducts.length + ')'"></h2>
             </div>
 
-            <!-- รายการสินค้า -->
+            <!-- รายการสินค้าสไตล์ Kaidee Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <template x-for="item in filteredProducts" :key="item.id">
-                    <div class="bg-white rounded-2xl shadow-forest hover:shadow-forest-card transition duration-200 overflow-hidden flex flex-col justify-between border border-emerald-50">
+                    <div class="bg-white rounded-xl shadow-kaidee hover:shadow-kaidee-card transition duration-200 overflow-hidden flex flex-col justify-between border border-slate-200">
                         <div>
                             <div class="aspect-square bg-slate-100 relative overflow-hidden">
                                 <img :src="item.images[0]" class="w-full h-full object-cover hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/400x400?text=No+Image'">
-                                <span class="absolute top-2 left-2 bg-forestPrimary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow" x-text="item.category"></span>
+                                <span class="absolute top-2 left-2 bg-kaideeBlue text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow" x-text="item.category"></span>
                             </div>
                             
                             <div class="p-3">
-                                <h3 class="text-xs font-bold text-slate-800 line-clamp-2 h-8 leading-tight mb-1" x-text="item.title"></h3>
+                                <h3 class="text-xs font-bold text-slate-900 line-clamp-2 h-8 leading-tight mb-1" x-text="item.title"></h3>
                                 <div class="text-[11px] text-slate-500 truncate mb-2" x-text="item.storeName + ' (' + item.bankAccName + ')'"></div>
-                                <div class="text-forestPrimary font-black text-sm" x-text="'฿' + item.price.toLocaleString()"></div>
+                                <div class="text-kaideeAccent font-black text-base" x-text="'฿' + item.price.toLocaleString()"></div>
                             </div>
                         </div>
 
                         <div class="p-3 pt-0">
-                            <button @click="openChat(item)" class="w-full bg-emerald-50 hover:bg-forestPrimary hover:text-white text-forestPrimary border border-forestPrimary/20 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1">
+                            <button @click="openChat(item)" class="w-full bg-blue-50 hover:bg-kaideeBlue hover:text-white text-kaideeBlue border border-kaideeBlue/30 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-1">
                                 <span>💬 แชทสอบถาม</span>
                             </button>
                         </div>
@@ -151,42 +161,42 @@
         </div>
 
         <!-- 2. หน้าลงทะเบียนร้าน -->
-        <div x-show="currentTab === 'register-vendor'" class="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-forest border border-emerald-50" x-transition>
-            <h2 class="text-2xl font-bold text-forestPrimary mb-2">สมัครเปิดร้านค้าออนไลน์</h2>
+        <div x-show="currentTab === 'register-vendor'" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-kaidee border border-slate-200" x-transition>
+            <h2 class="text-xl font-bold text-kaideeBlue mb-2">สมัครเปิดร้านค้าออนไลน์</h2>
             <p class="text-xs text-slate-500 mb-6">กรอกข้อมูลจริงเพื่อรอการตรวจสอบความปลอดภัยจากแอดมิน</p>
             
             <form @submit.prevent="submitVendorRegistration()" class="space-y-4 text-sm">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">ชื่อร้านค้า</label>
-                    <input type="text" x-model="vendorForm.storeName" required class="w-full border-2 rounded-xl px-4 py-3 focus:border-forestPrimary outline-none">
+                    <input type="text" x-model="vendorForm.storeName" required class="w-full border rounded-lg px-4 py-2.5 focus:border-kaideeBlue outline-none">
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">ชื่อ-นามสกุลจริง (เจ้าของร้าน)</label>
-                    <input type="text" x-model="vendorForm.ownerName" required class="w-full border-2 rounded-xl px-4 py-3 focus:border-forestPrimary outline-none">
+                    <input type="text" x-model="vendorForm.ownerName" required class="w-full border rounded-lg px-4 py-2.5 focus:border-kaideeBlue outline-none">
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">เลขที่บัญชีธนาคาร</label>
-                    <input type="text" x-model="vendorForm.bankAcc" required class="w-full border-2 rounded-xl px-4 py-3 focus:border-forestPrimary outline-none" placeholder="เช่น 123-4-56789-0">
+                    <input type="text" x-model="vendorForm.bankAcc" required class="w-full border rounded-lg px-4 py-2.5 focus:border-kaideeBlue outline-none" placeholder="เช่น 123-4-56789-0">
                 </div>
-                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-                    <label class="block font-bold text-slate-700 mb-1">ชื่อบัญชีธนาคาร <span class="text-forestPrimary">*ต้องตรงกับชื่อเจ้าของร้าน</span></label>
-                    <input type="text" x-model="vendorForm.bankAccName" required class="w-full border-2 border-white rounded-xl px-4 py-3 focus:border-forestPrimary outline-none font-bold bg-white shadow-sm">
+                <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                    <label class="block font-bold text-slate-700 mb-1">ชื่อบัญชีธนาคาร <span class="text-kaideeAccent">*ต้องตรงกับชื่อเจ้าของร้าน</span></label>
+                    <input type="text" x-model="vendorForm.bankAccName" required class="w-full border rounded-lg px-4 py-2.5 focus:border-kaideeBlue outline-none font-bold bg-white">
                 </div>
-                <button type="submit" class="w-full bg-forestPrimary hover:bg-forestDark text-white py-3.5 rounded-xl font-bold shadow transition">ส่งข้อมูลขออนุมัติ</button>
+                <button type="submit" class="w-full bg-kaideeBlue hover:bg-slate-900 text-white py-3 rounded-lg font-bold shadow transition">ส่งข้อมูลขออนุมัติ</button>
             </form>
         </div>
 
         <!-- 3. หน้าลงโพสต์ขายสินค้า -->
-        <div x-show="currentTab === 'post-product'" class="max-w-xl mx-auto bg-white p-8 rounded-3xl shadow-forest border border-emerald-50" x-transition>
+        <div x-show="currentTab === 'post-product'" class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-kaidee border border-slate-200" x-transition>
             <div class="mb-6 border-b pb-3">
-                <h2 class="text-2xl font-bold text-forestPrimary">➕ เพิ่มสินค้าใหม่</h2>
+                <h2 class="text-xl font-bold text-kaideeBlue">➕ ลงขายสินค้าใหม่</h2>
                 <p class="text-xs text-slate-500 mt-0.5">กรอกข้อมูลและเลือกรูปภาพสินค้าของคุณ</p>
             </div>
             
             <form @submit.prevent="submitProduct()" class="space-y-4 text-sm">
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">หมวดหมู่สินค้า</label>
-                    <select x-model="productForm.category" required class="w-full border-2 rounded-xl px-4 py-3 focus:border-forestPrimary outline-none bg-white font-bold">
+                    <select x-model="productForm.category" required class="w-full border rounded-lg px-4 py-2.5 focus:border-kaideeBlue outline-none bg-white font-bold">
                         <option value="">-- เลือกหมวดหมู่ --</option>
                         <option value="สัตว์น้ำ">🐟 สัตว์น้ำ</option>
                         <option value="สัตว์บก">🐅 สัตว์บก</option>
@@ -197,46 +207,46 @@
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">ชื่อสินค้า</label>
-                    <input type="text" x-model="productForm.title" required class="w-full border-2 rounded-xl px-4 py-3 focus:border-forestPrimary outline-none" placeholder="เช่น ปลาทองรันชู ไซส์สวยๆ">
+                    <input type="text" x-model="productForm.title" required class="w-full border rounded-lg px-4 py-2.5 focus:border-kaideeBlue outline-none" placeholder="เช่น ปลาทองรันชู ไซส์สวยๆ">
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">ราคา (บาท)</label>
-                    <input type="number" x-model="productForm.price" required class="w-full border-2 rounded-xl px-4 py-3 focus:border-forestPrimary outline-none" placeholder="เช่น 350">
+                    <input type="number" x-model="productForm.price" required class="w-full border rounded-lg px-4 py-2.5 focus:border-kaideeBlue outline-none" placeholder="เช่น 350">
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">รายละเอียดสินค้า</label>
-                    <textarea x-model="productForm.desc" rows="3" required class="w-full border-2 rounded-xl px-4 py-3 focus:border-forestPrimary outline-none" placeholder="ระบุขนาด ตำหนิ หรือการจัดส่ง..."></textarea>
+                    <textarea x-model="productForm.desc" rows="3" required class="w-full border rounded-lg px-4 py-2.5 focus:border-kaideeBlue outline-none" placeholder="ระบุขนาด ตำหนิ หรือการจัดส่ง..."></textarea>
                 </div>
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">รูปภาพสินค้า (เลือกจากอัลบั้ม)</label>
-                    <input type="file" @change="handleImageUpload" accept="image/*" multiple class="w-full border-2 border-dashed rounded-xl p-3 text-xs bg-slate-50 cursor-pointer">
+                    <input type="file" @change="handleImageUpload" accept="image/*" multiple class="w-full border border-dashed rounded-lg p-3 text-xs bg-slate-50 cursor-pointer">
                     
                     <div class="flex gap-2 mt-2 overflow-x-auto" x-show="productForm.images.length > 0">
                         <template x-for="img in productForm.images">
-                            <img :src="img" class="w-16 h-16 object-cover rounded-xl border shadow-sm">
+                            <img :src="img" class="w-16 h-16 object-cover rounded-lg border shadow-sm">
                         </template>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-forestPrimary hover:bg-forestDark text-white py-3.5 rounded-xl font-bold shadow transition">ยืนยันการลงขาย</button>
+                <button type="submit" class="w-full bg-kaideeBlue hover:bg-slate-900 text-white py-3 rounded-lg font-bold shadow transition">ยืนยันการลงขาย</button>
             </form>
         </div>
 
         <!-- 4. หน้าแชทร้านค้า -->
-        <div x-show="currentTab === 'chat'" class="max-w-2xl mx-auto bg-white rounded-3xl shadow-forest border overflow-hidden flex flex-col h-[600px]" x-transition>
-            <div class="bg-forestPrimary text-white px-6 py-4 flex justify-between items-center shadow-sm">
+        <div x-show="currentTab === 'chat'" class="max-w-2xl mx-auto bg-white rounded-2xl shadow-kaidee border overflow-hidden flex flex-col h-[600px]" x-transition>
+            <div class="bg-kaideeBlue text-white px-6 py-4 flex justify-between items-center shadow-sm">
                 <div>
                     <div class="font-bold text-sm" x-text="'ร้าน: ' + activeChatStore"></div>
-                    <div class="text-[11px] text-emerald-100" x-text="'สินค้า: ' + activeChatProduct"></div>
+                    <div class="text-[11px] text-blue-200" x-text="'สินค้า: ' + activeChatProduct"></div>
                 </div>
-                <button @click="currentTab = 'home'" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-xl text-xs font-bold transition">← กลับ</button>
+                <button @click="currentTab = 'home'" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg text-xs font-bold transition">← กลับ</button>
             </div>
             
             <div class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-sm" id="chatContainer">
                 <template x-for="msg in chatMessages">
                     <div class="flex flex-col" :class="msg.sender === 'ผู้ซื้อ' ? 'items-end' : 'items-start'">
                         <div class="text-[10px] text-slate-400 mb-0.5 px-1 font-bold" x-text="msg.sender"></div>
-                        <div class="px-4 py-2.5 rounded-2xl max-w-[80%] shadow-sm" 
-                             :class="msg.sender === 'ผู้ซื้อ' ? 'bg-forestPrimary text-white' : (msg.sender === 'ระบบ' ? 'bg-amber-100 text-amber-900 border w-full text-center' : 'bg-white text-slate-800 border')" 
+                        <div class="px-4 py-2.5 rounded-xl max-w-[80%] shadow-sm" 
+                             :class="msg.sender === 'ผู้ซื้อ' ? 'bg-kaideeBlue text-white' : (msg.sender === 'ระบบ' ? 'bg-amber-100 text-amber-900 border w-full text-center' : 'bg-white text-slate-800 border')" 
                              x-text="msg.text">
                         </div>
                     </div>
@@ -244,8 +254,8 @@
             </div>
 
             <div class="p-3 bg-white border-t flex space-x-2 items-center">
-                <input type="text" x-model="newMessage" @keyup.enter="sendChatMessage()" placeholder="พิมพ์ข้อความคุยกับร้านค้า..." class="flex-1 border-2 rounded-xl px-4 py-2.5 text-sm focus:border-forestPrimary outline-none">
-                <button @click="sendChatMessage()" class="bg-forestPrimary text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow hover:bg-forestDark transition">ส่ง</button>
+                <input type="text" x-model="newMessage" @keyup.enter="sendChatMessage()" placeholder="พิมพ์ข้อความคุยกับร้านค้า..." class="flex-1 border rounded-lg px-4 py-2.5 text-sm focus:border-kaideeBlue outline-none">
+                <button @click="sendChatMessage()" class="bg-kaideeBlue text-white px-6 py-2.5 rounded-lg text-xs font-bold shadow hover:bg-slate-900 transition">ส่ง</button>
             </div>
         </div>
 
@@ -257,29 +267,29 @@
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div class="bg-white p-4 rounded-2xl shadow-forest text-center border">
-                    <div class="text-2xl font-black text-forestPrimary" x-text="products.length"></div>
+                <div class="bg-white p-4 rounded-2xl shadow-kaidee text-center border">
+                    <div class="text-2xl font-black text-kaideeBlue" x-text="products.length"></div>
                     <div class="text-xs text-slate-500 mt-1">สินค้าทั้งหมด</div>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-forest text-center border">
+                <div class="bg-white p-4 rounded-2xl shadow-kaidee text-center border">
                     <div class="text-2xl font-black text-green-600" x-text="approvedVendors.length"></div>
                     <div class="text-xs text-slate-500 mt-1">ร้านค้าอนุมัติแล้ว</div>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-forest text-center border">
+                <div class="bg-white p-4 rounded-2xl shadow-kaidee text-center border">
                     <div class="text-2xl font-black text-amber-500" x-text="pendingVendors.length"></div>
                     <div class="text-xs text-slate-500 mt-1">รอดำเนินการ</div>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-forest text-center border">
+                <div class="bg-white p-4 rounded-2xl shadow-kaidee text-center border">
                     <div class="text-2xl font-black text-blue-600" x-text="Object.keys(categoryCounts).length"></div>
                     <div class="text-xs text-slate-500 mt-1">หมวดหมู่Active</div>
                 </div>
             </div>
 
-            <div class="bg-white p-5 rounded-3xl shadow-forest border">
+            <div class="bg-white p-5 rounded-2xl shadow-kaidee border">
                 <h3 class="font-bold text-slate-800 mb-3 text-sm">👥 ร้านค้าในระบบ</h3>
                 <div class="space-y-2">
                     <template x-for="v in approvedVendors">
-                        <div class="p-3 bg-slate-50 rounded-2xl border flex justify-between items-center text-xs">
+                        <div class="p-3 bg-slate-50 rounded-xl border flex justify-between items-center text-xs">
                             <div>
                                 <div class="font-bold text-slate-900 text-sm" x-text="v.storeName"></div>
                                 <div class="text-slate-500 mt-0.5" x-text="'เจ้าของ: ' + v.ownerName + ' | บัญชี: ' + v.bankAcc + ' (' + v.bankAccName + ')'"></div>
@@ -290,18 +300,18 @@
                 </div>
             </div>
 
-            <div class="bg-white p-5 rounded-3xl shadow-forest border">
+            <div class="bg-white p-5 rounded-2xl shadow-kaidee border">
                 <h3 class="font-bold text-slate-800 mb-3 text-sm">🔔 คำขอเปิดร้านค้า (รออนุมัติ)</h3>
                 <div class="space-y-2">
                     <template x-for="(v, index) in pendingVendors" :key="index">
-                        <div class="p-3 border rounded-2xl flex justify-between items-center bg-amber-50/40 text-xs">
+                        <div class="p-3 border rounded-xl flex justify-between items-center bg-amber-50/40 text-xs">
                             <div>
                                 <div class="font-bold text-slate-900 text-sm" x-text="v.storeName"></div>
                                 <div class="text-slate-600" x-text="'เจ้าของ: ' + v.ownerName + ' | บัญชี: ' + v.bankAcc + ' (' + v.bankAccName + ')'"></div>
                             </div>
                             <div class="space-x-1">
-                                <button @click="approveVendor(index)" class="bg-green-500 text-white px-3 py-1.5 rounded-xl font-bold">อนุมัติ</button>
-                                <button @click="rejectVendor(index)" class="bg-red-500 text-white px-3 py-1.5 rounded-xl font-bold">ปฏิเสธ</button>
+                                <button @click="approveVendor(index)" class="bg-green-500 text-white px-3 py-1.5 rounded-lg font-bold">อนุมัติ</button>
+                                <button @click="rejectVendor(index)" class="bg-red-500 text-white px-3 py-1.5 rounded-lg font-bold">ปฏิเสธ</button>
                             </div>
                         </div>
                     </template>
@@ -315,17 +325,17 @@
     </main>
 
     <!-- Modal ล็อกอิน -->
-    <div x-show="showLoginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" x-transition>
-        <div class="bg-white p-6 rounded-3xl w-full max-w-xs shadow-xl relative text-sm">
+    <div x-show="showLoginModal" class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm flex items-center justify-center z-50 p-4" x-transition>
+        <div class="bg-white p-6 rounded-2xl w-full max-w-xs shadow-2xl relative text-sm">
             <button @click="showLoginModal = false" class="absolute top-4 right-4 text-slate-400 font-bold">✕</button>
             <h3 class="text-lg font-bold text-slate-900 mb-1">เข้าสู่ระบบ / สมัครร้านค้า</h3>
             <p class="text-xs text-slate-500 mb-4">กรอกอีเมลหรือเบอร์โทรศัพท์ของคุณ</p>
             
-            <input type="text" x-model="loginInput" placeholder="E-mail หรือ เบอร์โทร" class="w-full border-2 rounded-xl px-4 py-2.5 text-xs mb-3 focus:border-forestPrimary outline-none font-bold text-center">
+            <input type="text" x-model="loginInput" placeholder="E-mail หรือ เบอร์โทร" class="w-full border rounded-xl px-4 py-2.5 text-xs mb-3 focus:border-kaideeBlue outline-none font-bold text-center">
             
             <div class="space-y-2">
-                <button @click="goToVendorRegister()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-bold transition">สมัครเปิดร้านค้า</button>
-                <button @click="loginAsVendor()" class="w-full bg-forestPrimary hover:bg-forestDark text-white py-2.5 rounded-xl text-xs font-bold transition">เข้าสู่ระบบ (ผู้ขาย)</button>
+                <button @click="goToVendorRegister()" class="w-full bg-forestPrimary hover:bg-emerald-800 text-white py-2.5 rounded-xl text-xs font-bold transition">สมัครเปิดร้านค้า</button>
+                <button @click="loginAsVendor()" class="w-full bg-kaideeBlue hover:bg-slate-900 text-white py-2.5 rounded-xl text-xs font-bold transition">เข้าสู่ระบบ (ผู้ขาย)</button>
                 <div class="pt-2 border-t">
                     <button @click="loginAsAdmin()" class="w-full bg-slate-800 text-white py-2 rounded-xl text-xs font-bold">🔐 เข้าสู่ระบบแอดมิน</button>
                 </div>
@@ -334,11 +344,11 @@
     </div>
 
     <!-- Popup แจ้งเตือน -->
-    <div x-show="showCustomAlert" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" x-transition>
-        <div class="bg-white p-5 rounded-3xl w-full max-w-xs shadow-xl text-center relative text-sm">
+    <div x-show="showCustomAlert" class="fixed inset-0 bg-slate-900/65 backdrop-blur-sm flex items-center justify-center z-50 p-4" x-transition>
+        <div class="bg-white p-5 rounded-2xl w-full max-w-xs shadow-2xl text-center relative text-sm">
             <h3 class="font-bold text-slate-900 mb-2">แจ้งเตือน</h3>
             <p class="text-xs text-slate-600 mb-4" x-text="alertMessage"></p>
-            <button @click="showCustomAlert = false" class="w-full bg-forestPrimary text-white py-2.5 rounded-xl text-xs font-bold">ตกลง</button>
+            <button @click="showCustomAlert = false" class="w-full bg-kaideeBlue text-white py-2.5 rounded-xl text-xs font-bold">ตกลง</button>
         </div>
     </div>
 
@@ -400,6 +410,16 @@
                     let counts = {};
                     this.products.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
                     return counts;
+                },
+
+                handlePostClick() {
+                    if (!this.currentUser) {
+                        this.showLoginModal = true;
+                    } else if (this.userRole === 'vendor' && this.vendorStatus === 'approved') {
+                        this.currentTab = 'post-product';
+                    } else {
+                        this.showAlert('กรุณารอแอดมินอนุมัติสิทธิ์ร้านค้าก่อนเริ่มโพสต์ขายครับ');
+                    }
                 },
 
                 handleImageUpload(event) {
