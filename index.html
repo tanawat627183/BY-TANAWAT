@@ -10,11 +10,11 @@
             theme: {
                 extend: {
                     colors: {
-                        proDark: '#0B192C',     // น้ำเงินเข้มหรูหรา
-                        proBlue: '#1E3E62',     // น้ำเงินรอง
-                        proGreen: '#16C47F',    // เขียวพรีเมียม (Verified)
-                        proOrange: '#FF6500',   // ส้มเน้นราคา/ปุ่มสำคัญ
-                        proBg: '#F1F5F9',       // พื้นหลังสะอาดตา
+                        proDark: '#0B192C',     
+                        proBlue: '#1E3E62',     
+                        proGreen: '#16C47F',    
+                        proOrange: '#FF6500',   
+                        proBg: '#F1F5F9',       
                     },
                     boxShadow: {
                         'pro': '0 10px 30px -5px rgba(11, 25, 44, 0.08)',
@@ -26,7 +26,6 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        /* เอฟเฟกต์ข้อความประกาศวิ่ง (Marquee) */
         @keyframes marquee {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -86,8 +85,9 @@
                     </div>
                 </template>
 
-                <template x-if="!currentUser || (userRole === 'vendor' && vendorStatus === 'approved')">
-                    <button @click="handlePostClick()" class="bg-gradient-to-r from-proOrange to-orange-500 hover:from-orange-600 hover:to-orange-600 text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-lg shadow-orange-500/20 transition transform hover:-translate-y-0.5">
+                <!-- ปุ่มลงขาย (จะแสดงเฉพาะผู้ขายที่ผ่านการอนุมัติ Verified แล้วเท่านั้น) -->
+                <template x-if="userRole === 'vendor' && vendorStatus === 'approved'">
+                    <button @click="currentTab = 'post-product'" class="bg-gradient-to-r from-proOrange to-orange-500 hover:from-orange-600 hover:to-orange-600 text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-lg shadow-orange-500/20 transition transform hover:-translate-y-0.5">
                         + ลงขายสินค้า
                     </button>
                 </template>
@@ -544,11 +544,18 @@
                     if(!this.loginInput) { this.showAlert('กรุณากรอกอีเมลหรือเบอร์โทร'); return; }
                     this.currentUser = this.loginInput;
                     this.userRole = 'vendor';
-                    let found = this.approvedVendors.find(v => v.storeName === this.currentUser);
-                    this.vendorStatus = found ? 'approved' : 'pending';
+                    
+                    // ตรวจสอบสถานะจริงจากฐานข้อมูลร้านค้าที่อนุมัติแล้ว
+                    let found = this.approvedVendors.find(v => v.storeName.toLowerCase() === this.currentUser.toLowerCase());
+                    if (found) {
+                        this.vendorStatus = 'approved';
+                        this.showAlert('เข้าสู่ระบบสำเร็จ! (ร้านค้าผ่านการ Verified แล้ว)');
+                    } else {
+                        this.vendorStatus = 'pending';
+                        this.showAlert('เข้าสู่ระบบสำเร็จ! แต่สถานะร้านค้าของคุณยังไม่ได้รับการอนุมัติจากแอดมิน (ปุ่มลงขายจะถูกซ่อน)');
+                    }
                     this.showLoginModal = false;
                     this.loginInput = '';
-                    this.showAlert('เข้าสู่ระบบสำเร็จ!');
                 },
 
                 loginAsAdmin() {
@@ -569,7 +576,10 @@
                 },
 
                 logout() {
-                    this.currentUser = null; this.userRole = 'guest'; this.vendorStatus = 'none'; this.currentTab = 'home';
+                    this.currentUser = null; 
+                    this.userRole = 'guest'; 
+                    this.vendorStatus = 'none'; 
+                    this.currentTab = 'home';
                 },
 
                 submitVendorRegistration() {
@@ -587,8 +597,10 @@
                 approveVendor(index) {
                     let approvedStore = this.pendingVendors.splice(index, 1)[0];
                     this.approvedVendors.push(approvedStore);
-                    this.vendorStatus = 'approved';
-                    this.userRole = 'vendor';
+                    // หากผู้ใช้นั้นกำลังล็อกอินอยู่ ให้ปรับสถานะเป็น approved ทันที
+                    if (this.currentUser && this.currentUser.toLowerCase() === approvedStore.storeName.toLowerCase()) {
+                        this.vendorStatus = 'approved';
+                    }
                     this.showAlert('อนุมัติ Verified ร้านค้าสำเร็จ!');
                 },
 
@@ -598,7 +610,7 @@
                     if(!this.productForm.category) { this.showAlert('กรุณาเลือกหมวดหมู่'); return; }
                     if(this.productForm.images.length === 0) { this.showAlert('กรุณาเลือกรูปภาพ'); return; }
                     
-                    let storeInfo = this.approvedVendors.find(v => v.storeName === this.currentUser);
+                    let storeInfo = this.approvedVendors.find(v => v.storeName.toLowerCase() === this.currentUser.toLowerCase());
                     let bankName = storeInfo ? storeInfo.bankAccName : this.currentUser;
 
                     this.products.unshift({
